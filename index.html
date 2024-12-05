@@ -13,10 +13,10 @@
     <h1>Aim Trainer <code>1.0</code></h1>
   </nav>
   <script>
-
     let circle = { x: 0, y: 0, radius: 20 };
-    let timer;
+    let timer, visibilityTimer;
     let gameOver = false;
+    let circleVisible = true;
     let punkte = 0;
     let missThreshold = 30;
     let gameDuration = 20000;
@@ -25,13 +25,12 @@
     let clickSound = new Audio("click.wav");
     let loseSound = new Audio("lose.wav");
     let backgroundSound = new Audio("background-music.mp3");
-    backgroundSound.loop = true;  // Make the music loop
-    backgroundSound.volume = 0.1; // Lower the volume
+    backgroundSound.loop = true;
 
     function setup() {
       Canvas.init([0, 400], [0, 400], { width: 400, height: 400, background: [255, 255, 255] });
       gameStartTime = Date.now();
-
+      backgroundSound.play(); // Play background music
       newCircle();
       startGameTimer();
     }
@@ -39,8 +38,15 @@
     function newCircle() {
       circle.x = Math.random() * (400 - 40) + 20;
       circle.y = Math.random() * (400 - 40) + 20;
-
       circle.radius = Math.max(10, 20 - clickCount);
+      circleVisible = true;
+
+      // Hide circle after a short time
+      clearTimeout(visibilityTimer);
+      visibilityTimer = setTimeout(() => {
+        circleVisible = false;
+      }, 300); // Circle is visible for 800ms
+
       resetTimer();
     }
 
@@ -59,7 +65,6 @@
 
     function loseGame() {
       gameOver = true;
-      backgroundSound.pause();
       loseSound.play();
     }
 
@@ -72,7 +77,9 @@
           Canvas.text(200, 200, "Verloren!", { size: 24, color: "red", align: "center" });
         }
       } else {
-        Canvas.circle(circle.x, circle.y, circle.radius, { fill: "blue" });
+        if (circleVisible) {
+          Canvas.circle(circle.x, circle.y, circle.radius, { fill: "blue" });
+        }
         let remainingTime = gameDuration - (Date.now() - gameStartTime);
         Canvas.text(200, 40, "Zeit übrig: " + Math.max(0, Math.floor(remainingTime / 1000)) + "s", { size: 24, color: "black", align: "center" });
       }
@@ -81,11 +88,6 @@
 
     function on_mouse_down(x, y) {
       if (gameOver) return;
-
-      if (!backgroundSound.playing) {
-        backgroundSound.play(); // Start background music after first click
-      }
-
       const distance = Math.sqrt((x - circle.x) ** 2 + (y - circle.y) ** 2);
 
       if (distance <= circle.radius) {
@@ -94,7 +96,6 @@
         clickSound.play();
         newCircle();
       } else {
-
         if (distance <= (circle.radius + missThreshold)) {
           punkte += Math.max(0, Math.floor(10 - (distance / 5)));
           newCircle();
@@ -103,6 +104,7 @@
         }
       }
     }
+
   </script>
 </body>
 
