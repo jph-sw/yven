@@ -12,6 +12,13 @@
   <nav class="header">
     <h1>Aim Trainer <code>1.0</code></h1>
   </nav>
+
+  <div>
+    <div id="game-div" class="game-div" style="text-align: center;">
+      <canvas id="canvas-id-7188442524" width="400" height="400"></canvas>
+    </div>
+  </div>
+
   <script>
     let circle = { x: 0, y: 0, radius: 20 };
     let timer, visibilityTimer;
@@ -28,7 +35,7 @@
     backgroundSound.loop = true;
 
     function setup() {
-      Canvas.init([0, 400], [0, 400], { width: 400, height: 400, background: [255, 255, 255] });
+      Canvas.init([0, 400], [0, 400], { width: 400, height: 400, background: [255, 255, 255], div: "game-div" });
       gameStartTime = Date.now();
       backgroundSound.play(); // Play background music
       newCircle();
